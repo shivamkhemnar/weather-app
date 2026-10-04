@@ -1,0 +1,7 @@
+event_type,shipment_id,description,severity
+weather,SHP-001,Heavy rainfall on Mumbai-Nashik highway,high
+traffic,SHP-001,High congestion near Igatpuri ghat,high
+iot,SHP-001,Reefer temperature anomaly 12C (limit 8C),medium
+supplier,SHP-003,Supplier delayed by 3 days due to warehouse strike,high
+weather,SHP-004,Cyclone warning near Chennai coast,critical
+traffic,SHP-002,Accident on Nashik-Pune road delays 2 hrs,medium

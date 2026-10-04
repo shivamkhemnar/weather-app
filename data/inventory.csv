@@ -1,0 +1,6 @@
+product_id,product_name,current_stock,reorder_point,safety_stock,daily_demand,unit_price
+PRD-001,Tomatoes,120,200,80,60,40
+PRD-002,Onions,350,250,100,50,30
+PRD-003,Dairy Products,60,150,60,40,120
+PRD-004,Seafood,200,180,70,45,250
+PRD-005,Grains,900,500,200,80,25

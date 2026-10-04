@@ -1,0 +1,6 @@
+contract_id,supplier_id,penalty_per_day,maximum_delay_days,contract_value,product
+CTR-001,SUP-001,5000,5,500000,Tomatoes
+CTR-002,SUP-002,3000,7,400000,Onions
+CTR-003,SUP-003,4000,4,600000,Grains
+CTR-004,SUP-004,7000,3,800000,Dairy Products
+CTR-005,SUP-005,6000,5,750000,Seafood

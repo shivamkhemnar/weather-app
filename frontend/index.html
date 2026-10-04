@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RouteRisk India — Supply Chain Weather & Traffic Intelligence</title>
+<link rel="stylesheet" href="/static/styles.css?v=6" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand">🛣️ RouteRisk <span>India</span></div>
+    <div class="sub">Weather • Traffic • Risk</div>
+    <nav id="nav">
+      <button data-tab="overview" class="active">📊 Overview</button>
+      <button data-tab="route">🗺️ Route</button>
+      <button data-tab="weather">🌦️ Weather</button>
+      <button data-tab="traffic">🚦 Traffic</button>
+      <button data-tab="shipments">🚚 Shipments</button>
+      <button data-tab="risks">⚠️ Risks</button>
+      <button data-tab="decisions">🤖 Decisions</button>
+      <button data-tab="alerts">🔔 Alerts</button>
+      <button data-tab="stock">📦 Stock & Suppliers</button>
+      <button data-tab="settings">⚙️ Settings</button>
+    </nav>
+    <div class="sidefoot"><span id="liveDot" class="dot"></span><span id="liveTxt">Checking…</span></div>
+  </aside>
+
+  <main>
+    <div class="topbar">
+      <div class="routebar">
+        <div class="rloc">
+          <span class="pin start">●</span>
+          <input id="fromIn" placeholder="Start point — e.g. Mumbai" autocomplete="off" oninput="suggestFor('fromIn','fromSug')" onfocus="suggestFor('fromIn','fromSug')" />
+          <div id="fromSug" class="suggest"></div>
+        </div>
+        <button class="swap" onclick="swapRoute()" title="Swap start and drop">⇄</button>
+        <div class="rloc">
+          <span class="pin end">●</span>
+          <input id="toIn" placeholder="Drop point — e.g. Nashik" autocomplete="off" oninput="suggestFor('toIn','toSug')" onfocus="suggestFor('toIn','toSug')" />
+          <div id="toSug" class="suggest"></div>
+        </div>
+        <button class="plan" onclick="planFromBar()">🗺️ Plan route</button>
+      </div>
+      <div class="topbtns">
+        <button onclick="refreshNow()">⚡ Refresh now</button>
+        <button id="runBtn" onclick="toggleRun()">⏸ Pause</button>
+      </div>
+    </div>
+
+    <section id="tab-overview" class="tab active">
+      <div id="cards" class="cards"></div>
+      <div class="grid2">
+        <div class="card"><h3>Risk distribution</h3><canvas id="chRisk"></canvas></div>
+        <div class="card"><h3>Latest risk scores</h3><canvas id="chTrend"></canvas></div>
+      </div>
+      <div class="card"><h3>How it works</h3>
+        <p class="explain">Data refreshes every <b id="refreshLbl">4 hours</b> from <b>OpenWeatherMap</b> + <b>TomTom</b> when keys are set, otherwise safe simulation. Pipeline: Monitor → Risk (0–100) → Finance (penalty + shortage) → Optimize (5 strategies, lowest score wins) → Decide with explanation → Alert on HIGH/CRITICAL. Use <b>Refresh now</b> any time for an instant update.</p></div>
+    </section>
+
+    <section id="tab-route" class="tab">
+      <div class="card"><h3>🗺️ Route assessment — full report</h3>
+        <div class="row">
+          <select id="routeFrom" title="From"></select>
+          <span class="muted">→</span>
+          <select id="routeTo" title="To"></select>
+          <button onclick="planRoute('balanced')">⚖️ Balanced</button>
+          <button onclick="planRoute('cheapest')">💰 Cheapest</button>
+          <button onclick="planRoute('fastest')">⏱️ Fastest</button>
+        </div>
+        <div id="routeOut" class="muted">Search above (start + drop) or pick two cities — you get distance, drive time, live weather both ends, traffic, risk with reasons, every cost option, and the winner.</div>
+      </div>
+    </section>
+
+    <section id="tab-weather" class="tab">
+      <div class="card"><h3>🌦️ Live weather <small id="wxSrc"></small></h3>
+        <div class="row"><select id="wxCity" title="City"></select><button onclick="loadWeather()">🔄 Reload weather</button>
+        <a id="wxMap" target="_blank"><button>🗺️ Open map</button></a></div>
+        <div id="wxNow" class="big"></div></div>
+      <div class="card"><h3>5-day forecast</h3>
+        <div class="tablewrap"><table id="tblFc"><thead><tr><th>Time</th><th>Temp °C</th><th>Condition</th><th>Rain mm</th><th>Wind km/h</th></tr></thead><tbody></tbody></table></div>
+        <p id="fcMsg" class="muted"></p></div>
+      <div class="card"><h3>Recent stored readings</h3>
+        <div class="tablewrap"><table id="tblWx"><thead><tr><th>Shipment</th><th>Condition</th><th>Rain</th><th>Wind</th></tr></thead><tbody></tbody></table></div></div>
+    </section>
+
+    <section id="tab-traffic" class="tab">
+      <div class="card"><h3>🚦 Live traffic <small id="tfSrc"></small></h3>
+        <div class="row"><select id="tfCity" title="City"></select><button onclick="loadTraffic()">🔄 Reload traffic</button>
+        <a id="tfMap" target="_blank"><button>🗺️ Open map</button></a></div>
+        <div id="tfNow" class="big"></div></div>
+      <div class="card"><h3>Recent stored readings</h3>
+        <div class="tablewrap"><table id="tblTf"><thead><tr><th>Shipment</th><th>Congestion</th><th>Speed</th><th>Status</th></tr></thead><tbody></tbody></table></div></div>
+    </section>
+
+    <section id="tab-shipments" class="tab">
+      <div class="card"><h3>🚚 Shipments across India</h3>
+        <div class="row"><input id="shipSearch" placeholder="🔍 Filter shipments, products, routes…" oninput="filterShips(this.value)" style="flex:1;min-width:200px" /></div>
+        <div class="tablewrap"><table id="tblShip"><thead><tr><th>ID</th><th>Product</th><th>Route</th><th>Status</th><th>Cost ₹</th><th></th></tr></thead><tbody></tbody></table></div></div>
+    </section>
+
+    <section id="tab-risks" class="tab">
+      <div class="card"><h3>⚠️ Risk events</h3>
+        <div class="tablewrap"><table id="tblRisk"><thead><tr><th>Shipment</th><th>Score</th><th>Level</th><th>Time</th></tr></thead><tbody></tbody></table></div></div>
+    </section>
+
+    <section id="tab-decisions" class="tab">
+      <div class="card"><h3>🤖 Autonomous decisions</h3><div id="decisions"></div></div>
+    </section>
+
+    <section id="tab-alerts" class="tab">
+      <div class="card"><h3>🔔 Alerts</h3><div class="row"><button onclick="markAllRead()">✓ Mark all read</button></div><div id="alerts"></div></div>
+    </section>
+
+    <section id="tab-stock" class="tab">
+      <div class="grid2">
+        <div class="card"><h3>📦 Inventory</h3><div class="tablewrap"><table id="tblInv"><thead><tr><th>Product</th><th>Stock</th><th>Reorder</th><th>Status</th></tr></thead><tbody></tbody></table></div></div>
+        <div class="card"><h3>🏭 Suppliers & contracts</h3><div class="tablewrap"><table id="tblSup"><thead><tr><th>Name</th><th>Reliability</th><th>Delay</th></tr></thead><tbody></tbody></table></div>
+        <div class="tablewrap"><table id="tblCtr"><thead><tr><th>Contract</th><th>Penalty/day</th><th>Max delay</th></tr></thead><tbody></tbody></table></div></div>
+      </div>
+      <div class="card"><h3>📡 IoT (truck sensors, simulated)</h3><div class="tablewrap"><table id="tblIot"><thead><tr><th>Shipment</th><th>Temp</th><th>Sensor</th><th>GPS</th></tr></thead><tbody></tbody></table></div></div>
+    </section>
+
+    <section id="tab-settings" class="tab">
+      <div class="card"><h3>⚙️ Integrations & refresh</h3><div id="settings"></div>
+        <h4>Add your free API keys (your manual step)</h4>
+        <ol class="steps">
+          <li>Weather: <b>openweathermap.org/api</b> → sign up → copy key.</li>
+          <li>Traffic: <b>developer.tomtom.com</b> → sign up → Traffic Flow API → copy key.</li>
+          <li>In <b>C:\weather</b>, copy <b>.env.example</b> to <b>.env</b>, paste both keys, save.</li>
+          <li>Restart the server. Status above flips to <b>LIVE</b>.</li>
+        </ol>
+        <div class="row"><button onclick="refreshNow()">⚡ Refresh now</button><button onclick="loadSettings()">🔄 Recheck status</button></div>
+      </div>
+    </section>
+  </main>
+</div>
+<div id="toast" class="toast"></div>
+<script src="/static/app.js?v=6"></script>
+</body>
+</html>

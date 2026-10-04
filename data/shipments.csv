@@ -1,0 +1,6 @@
+shipment_id,product,supplier_id,origin,destination,current_location,expected_delivery,current_status,quantity,transportation_cost,distance_km
+SHP-001,Tomatoes,SUP-001,Mumbai,Nashik,Igatpuri,2026-10-02,In Transit,500,10000,180
+SHP-002,Onions,SUP-002,Nashik,Pune,Sinnar,2026-10-03,In Transit,800,12000,210
+SHP-003,Dairy Products,SUP-004,Delhi,Jaipur,Gurgaon,2026-10-01,Delayed,300,18000,280
+SHP-004,Seafood,SUP-005,Chennai,Bangalore,Vellore,2026-10-04,In Transit,400,15000,350
+SHP-005,Grains,SUP-003,Pune,Mumbai,Lonavala,2026-10-02,In Transit,1000,9000,150

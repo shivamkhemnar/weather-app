@@ -1,0 +1,6 @@
+supplier_id,supplier_name,reliability_score,capacity,current_delay_days,contract_id,location
+SUP-001,Sharma Agro Foods,82,1000,2,CTR-001,Mumbai
+SUP-002,Nashik Fresh Produce,91,800,0,CTR-002,Nashik
+SUP-003,Pune Logistics Hub,68,1200,1,CTR-003,Pune
+SUP-004,Delhi Cold Chain,75,1500,3,CTR-004,Delhi
+SUP-005,Chennai Marine Goods,88,900,0,CTR-005,Chennai
